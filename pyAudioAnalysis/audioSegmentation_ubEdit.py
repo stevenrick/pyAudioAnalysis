@@ -1178,10 +1178,11 @@ def music_thumbnailing(signal, sampling_rate, short_window=1.0, short_step=0.5,
         sim_matrix
 
 
-def main():
-    directory = "D:\\steve\\Documents\\Downloads\\speech_seg_test"
-    segments_file = "D:\\steve\\Documents\\Downloads\\EF  Data\\speech_segments.csv"
-    files = [os.path.join(directory, f) for f in os.listdir(directory) if ".wav" in f]
+def diarize(directory="", segments_file="", n_speakers=0, mid_window=1.0, mid_step=0.1, short_window=0.05, lda_dim=0, plot_res=False):
+    if (directory == ""):
+        directory = "D:\\steve\\Documents\\Downloads\\speech_seg_test"
+        segments_file = "D:\\steve\\Documents\\Downloads\\EF  Data\\speech_segments.csv"
+    files = [os.path.join(directory, f) for f in os.listdir(directory) if "speech.wav" in f]
     for f_path in files:
         seg_df = pd.read_csv(segments_file)
         time_total_array = []
@@ -1206,8 +1207,7 @@ def main():
             time_length_array.append(diff)
             t_sum += diff
 
-        results = speaker_diarization(filename=f_path, n_speakers=0, mid_window=1.0, mid_step=0.1, short_window=0.05,
-                                      lda_dim=0, plot_res=False)
+        results = speaker_diarization(f_path, n_speakers, mid_window, mid_step, short_window, lda_dim, plot_res)
         results_len = len(results)
         # print(results_len)
         sum_els = 0
@@ -1226,4 +1226,4 @@ def main():
             csvwriter.writerows(out_data)
 
 if __name__ == '__main__':
-    main()
+    diarize()
