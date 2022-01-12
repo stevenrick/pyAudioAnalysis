@@ -1190,7 +1190,6 @@ def diarize(directory="", segments_file="", n_speakers=0, mid_window=1.0, mid_st
         t_sum = 0
         out_data = []
         out_data.append(["Time", "SpeakerID"])
-        # print(f_path)
         f_match = os.path.basename(f_path.split(".speech")[0]+".wav")
         print(f_match)
         windows = seg_df.loc[seg_df["File"] == f_match]
@@ -1206,24 +1205,23 @@ def diarize(directory="", segments_file="", n_speakers=0, mid_window=1.0, mid_st
             time_total_array.append(t_sum)
             time_length_array.append(diff)
             t_sum += diff
-
-        results = speaker_diarization(f_path, n_speakers, mid_window, mid_step, short_window, lda_dim, plot_res)
-        results_len = len(results)
-        # print(results_len)
-        sum_els = 0
-        for i in range(len(time_length_array)):
-            startIdx = time_total_array[i]*10
-            strideIdx = time_length_array[i]*10
-            num_els = len(results[startIdx:startIdx+strideIdx])
-            sum_els += num_els
-            for j in range(num_els):
-                out_data.append([float(windowStartTimes[i])+0.1*j, results[startIdx:startIdx+strideIdx][j]])
-        #     print(i, float(windowStartTimes[i]), float(windowStartTimes[i])+strideIdx/10.0)
-        #     print(num_els, results[startIdx:startIdx+strideIdx])
-        # print(sum_els)
-        with open(os.path.join(directory, os.path.basename(f_path.split(".speech")[0]+".csv")), 'w', newline='') as file:
-            csvwriter = csv.writer(file, delimiter=',')
-            csvwriter.writerows(out_data)
+        try:
+            results = speaker_diarization(f_path, n_speakers, mid_window, mid_step, short_window, lda_dim, plot_res)
+            results_len = len(results)
+            sum_els = 0
+            for i in range(len(time_length_array)):
+                startIdx = time_total_array[i]*10
+                strideIdx = time_length_array[i]*10
+                num_els = len(results[startIdx:startIdx+strideIdx])
+                sum_els += num_els
+                for j in range(num_els):
+                    out_data.append([float(windowStartTimes[i])+0.1*j, results[startIdx:startIdx+strideIdx][j]])
+            with open(os.path.join(directory, os.path.basename(f_path.split(".speech")[0]+".csv")), 'w', newline='') as file:
+                csvwriter = csv.writer(file, delimiter=',')
+                csvwriter.writerows(out_data)
+        except (ValueError):
+            ## ValueError comes from LDA and typically gets thrown if there is not enough audio data to detect a minimum number of clusters (speakers)
+            print("Not enough audio/speech data for diarization")
 
 if __name__ == '__main__':
     diarize()
