@@ -1191,7 +1191,7 @@ def diarize(directory="", segments_file="", n_speakers=0, mid_window=1.0, mid_st
         out_data = []
         out_data.append(["Time", "SpeakerID"])
         f_match = os.path.basename(f_path.split(".speech")[0]+".wav")
-        print(f_match)
+        print("diarize:", f_match)
         windows = seg_df.loc[seg_df["File"] == f_match]
         windowStartTimes = []
         inter_data = windows["SpeechWindows"].values[0]
